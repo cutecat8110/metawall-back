@@ -1,0 +1,177 @@
+{
+	"info": {
+		"_postman_id": "8716ee23-ab40-46f9-b88a-8c6f5ecaaba7",
+		"name": "heroku - metawall",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20385040"
+	},
+	"item": [
+		{
+			"name": "新增-貼文",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user\": \"6284bd0df623a5fcf56630f0\",\r\n    \"content\": \"123\",\r\n    \"image\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://damp-springs-73410.herokuapp.com/post",
+					"protocol": "https",
+					"host": [
+						"damp-springs-73410",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "取得-貼文(one)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://damp-springs-73410.herokuapp.com/post/628ccf4d8a08b150eebda7b5",
+					"protocol": "https",
+					"host": [
+						"damp-springs-73410",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"post",
+						"628ccf4d8a08b150eebda7b5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "取得-貼文 (all)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://damp-springs-73410.herokuapp.com/posts/?q=5&timeSort=asc",
+					"protocol": "https",
+					"host": [
+						"damp-springs-73410",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"posts",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "5",
+							"description": "搜尋"
+						},
+						{
+							"key": "timeSort",
+							"value": "asc",
+							"description": "升序"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "編輯-貼文(one)",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "https://damp-springs-73410.herokuapp.com/post/628ccf4d8a08b150eebda7b5",
+					"protocol": "https",
+					"host": [
+						"damp-springs-73410",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"post",
+						"628ccf4d8a08b150eebda7b5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "刪除-貼文(one)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://damp-springs-73410.herokuapp.com/post/628791d45525c29215efd8e1",
+					"protocol": "https",
+					"host": [
+						"damp-springs-73410",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"post",
+						"628791d45525c29215efd8e1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "刪除-貼文(all)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://damp-springs-73410.herokuapp.com/post/",
+					"protocol": "https",
+					"host": [
+						"damp-springs-73410",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"post",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "取得-用戶(all)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://damp-springs-73410.herokuapp.com/users/",
+					"protocol": "https",
+					"host": [
+						"damp-springs-73410",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
