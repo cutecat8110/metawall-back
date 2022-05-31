@@ -1,12 +1,11 @@
 const handleSuccess = require("../service/handleSuccess");
 const appError = require("../service/appError");
-const handleErrorAsync = require("../service/handleErrorAsync");
 
 const Posts = require("../models/posts");
 const User = require("../models/user");
 
 const posts = {
-  getAll: handleErrorAsync(async (req, res, next) => {
+  getAll: async (req, res, next) => {
     const q =
       req.query.q !== undefined ? { content: new RegExp(req.query.q) } : {};
     const timeSort = req.query.timeSort == "asc" ? "createdAt" : "-createdAt";
@@ -17,8 +16,9 @@ const posts = {
       })
       .sort(timeSort);
     handleSuccess({ res, data });
-  }),
-  create: handleErrorAsync(async (req, res, next) => {
+  },
+  create: async (req, res, next) => {
+    
     const { user, image, content } = req.body;
     if (!content) return appError(400, "content 欄位為必填", next);
     if (!user) return appError(400, "user 欄位為必填", next);
@@ -30,31 +30,31 @@ const posts = {
       content,
     });
     handleSuccess({ res, data });
-  }),
-  deleteAll: handleErrorAsync(async (req, res, next) => {
+  },
+  deleteAll: async (req, res, next) => {
     const message = await Posts.deleteMany();
     handleSuccess({ res, message });
-  }),
-  getOne: handleErrorAsync(async (req, res, next) => {
+  },
+  getOne: async (req, res, next) => {
     const id = req.params.id;
     const data = await Posts.findById(id);
     if (!data) return appError(400, "貼文不存在", next);
     handleSuccess({ res, data });
-  }),
-  deleteOne: handleErrorAsync(async (req, res, next) => {
+  },
+  deleteOne: async (req, res, next) => {
     const id = req.params.id;
     const data = await Posts.findByIdAndDelete(id);
     if (!data) return appError(400, "貼文不存在", next);
     const message = "已刪除貼文";
     handleSuccess({ res, message });
-  }),
-  update: handleErrorAsync(async (req, res, next) => {
+  },
+  update: async (req, res, next) => {
     const id = req.params.id;
     const { likes } = req.body;
     const data = await Posts.findByIdAndUpdate(id, { likes }, { new: true });
     if (!data) return appError(400, "貼文不存在", next);
     handleSuccess({ res, data });
-  }),
+  },
 };
 
 module.exports = posts;
