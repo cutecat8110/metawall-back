@@ -51,7 +51,6 @@ const error = {
   },
   // 捕捉程式重大錯誤
   uncaughtException: process.on("uncaughtException", (err) => {
-    console.error("1");
     console.error("Uncaughted Exception！");
     console.error(err.name);
     console.error(err.message);

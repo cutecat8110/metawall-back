@@ -17,8 +17,9 @@ const postsSchema = new Schema(
       required: [true, "Content 未填寫"],
     },
     likes: {
-      type: Number,
-      default: 0,
+      type: [mongoose.Schema.ObjectId],
+      ref: "user",
+      default: [],
     },
     comments: {
       type: Number,
