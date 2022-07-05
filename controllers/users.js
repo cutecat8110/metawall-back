@@ -1,6 +1,8 @@
 const handleSuccess = require("../service/handleSuccess");
 const handleErrorAsync = require("../service/handleErrorAsync");
 const User = require("../models/user");
+const Posts = require("../models/posts");
+
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const appError = require("../service/appError");
@@ -9,8 +11,8 @@ const { generateJwt } = require("../service/auth");
 
 const users = {
   getAll: handleErrorAsync(async (req, res, next) => {
-    const data = await User.find();
-    handleSuccess({ res, data });
+    const users = await User.find();
+    handleSuccess(200, { users }, res);
   }),
   sign_up: handleErrorAsync(async (req, res, next) => {
     let { name, email, password } = req.body;
@@ -82,8 +84,8 @@ const users = {
     generateJwt(user, 201, res);
   }),
   getProfile: handleErrorAsync(async (req, res, next) => {
-    const data = req.user;
-    handleSuccess({ res, data });
+    const msg = { user: req.user };
+    handleSuccess(200, msg, res);
   }),
   updateProfile: handleErrorAsync(async (req, res, next) => {
     const { name, photo, sex } = req.body;
@@ -96,7 +98,7 @@ const users = {
     if (sex !== undefined && !validator.isIn(sex, ["male", "female"]))
       return next(appError(400, "sex 須符合枚舉 male 或 female", next));
 
-    const data = await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
       req.user.id,
       {
         name,
@@ -105,7 +107,19 @@ const users = {
       },
       { new: true, runValidators: true }
     );
-    handleSuccess({ res, data });
+
+    const msg = {
+      message: "用戶資訊已更新",
+      user,
+    };
+    handleSuccess(200, msg, res);
+  }),
+  getLikeList: handleErrorAsync(async (req, res, next) => {
+    const posts = await Posts.find({ likes: req.user.id }).populate({
+      path: "user",
+      select: "name photo",
+    });
+    handleSuccess(200, { posts }, res);
   }),
 };
 

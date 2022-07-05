@@ -1,8 +1,7 @@
-const handleSuccess = ({ data, res, message }) => {
-  res.status(200).json({
+const handleSuccess = (httpStatus, msg, res) => {
+  res.status(httpStatus).json({
     status: "success",
-    data,
-    message,
+    ...msg,
   });
 };
 

@@ -20,11 +20,18 @@ router.patch(
   postsCON.update,
   postsSpecs.update
 );
-router.put(
-  "/post/:id",
+router.post(
+  "/post/:id/likes",
   isAuth,
   postsCON.checkPost,
   postsCON.like,
+  postsSpecs.like
+);
+router.delete(
+  "/post/:id/likes",
+  isAuth,
+  postsCON.checkPost,
+  postsCON.unlike,
   postsSpecs.like
 );
 router.delete(

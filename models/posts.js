@@ -16,11 +16,12 @@ const postsSchema = new Schema(
       type: String,
       required: [true, "Content 未填寫"],
     },
-    likes: {
-      type: [mongoose.Schema.ObjectId],
-      ref: "user",
-      default: [],
-    },
+    likes: [
+      {
+        type: [mongoose.Schema.ObjectId],
+        ref: "user",
+      },
+    ],
     comments: {
       type: Number,
       default: 0,
