@@ -8,9 +8,9 @@ const swaggerDocument = require("./swagger-output.json");
 
 require("./connections");
 
-const errorControllers = require("./controllers/error");
-errorControllers.uncaughtException;
-errorControllers.unhandledRejection;
+const errorCON = require("./controllers/errors");
+errorCON.uncaughtException;
+errorCON.unhandledRejection;
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -32,7 +32,7 @@ app.use("/", postsRouter);
 app.use("/upload", uploadRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(errorControllers.error404);
-app.use(errorControllers.error);
+app.use(errorCON.error404);
+app.use(errorCON.error);
 
 module.exports = app;

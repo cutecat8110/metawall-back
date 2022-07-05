@@ -21,7 +21,7 @@ const resDev = (err, res) => {
   });
 };
 
-const error = {
+const errors = {
   // 404
   error404: (req, res, next) => {
     res.status(404).json({
@@ -62,4 +62,4 @@ const error = {
   }),
 };
 
-module.exports = error;
+module.exports = errors;

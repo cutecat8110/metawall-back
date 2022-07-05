@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const postsSchema = new Schema(
+const postSchema = new Schema(
   {
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "user",
-      required: [true, "user ID 未填寫"],
+      required: [true, "請輸入 user ID"],
     },
     image: {
       type: String,
@@ -14,7 +14,7 @@ const postsSchema = new Schema(
     },
     content: {
       type: String,
-      required: [true, "Content 未填寫"],
+      required: [true, "請輸入 content"],
     },
     likes: [
       {
@@ -22,10 +22,6 @@ const postsSchema = new Schema(
         ref: "user",
       },
     ],
-    comments: {
-      type: Number,
-      default: 0,
-    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -33,9 +29,18 @@ const postsSchema = new Schema(
   },
   {
     versionKey: false,
+    id: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-const Posts = mongoose.model("Posts", postsSchema);
+postSchema.virtual("comments", {
+  ref: "Comment",
+  foreignField: "post",
+  localField: "_id",
+});
 
-module.exports = Posts;
+const Post = mongoose.model("Post", postSchema);
+
+module.exports = Post;

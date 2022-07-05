@@ -1,7 +1,7 @@
 const handleSuccess = require("../service/handleSuccess");
 const handleErrorAsync = require("../service/handleErrorAsync");
 const User = require("../models/user");
-const Posts = require("../models/posts");
+const Post = require("../models/post");
 
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
@@ -115,7 +115,7 @@ const users = {
     handleSuccess(200, msg, res);
   }),
   getLikeList: handleErrorAsync(async (req, res, next) => {
-    const posts = await Posts.find({ likes: req.user.id }).populate({
+    const posts = await Post.find({ likes: req.user.id }).populate({
       path: "user",
       select: "name photo",
     });
