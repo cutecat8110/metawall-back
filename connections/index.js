@@ -6,4 +6,7 @@ const DB = process.env.DATABASE.replace(
   process.env.DATABASE_PASSWORD
 ).replace("Database", "metawall");
 
-mongoose.connect(DB).then(() => console.log("資料庫 連接成功"));
+mongoose
+  .connect(DB)
+  .then(() => console.log("資料庫 連接成功"))
+  .catch((err) => console.log(err));
