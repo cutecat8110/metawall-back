@@ -19,6 +19,7 @@ const posts = {
         path: "comments",
         select: "comment user",
       });
+
     if (!post) return appError(400, "貼文不存在", next);
     req.post = post;
     next();
@@ -49,16 +50,15 @@ const posts = {
   }),
   update: handleErrorAsync(async (req, res, next) => {
     const { image, content } = req.body;
-
+    const author = req.post.user._id.toString();
     // 檢查編輯權限
-    if (req.post.user.toString() !== req.user.id)
-      return appError(403, "無編輯權限", next);
+    if (author !== req.user.id) return appError(403, "無編輯權限", next);
 
     // content 不能為空字串
     if (content == "") return appError(400, "content 不能為空字串", next);
 
     const post = await Post.findByIdAndUpdate(
-      req.post.id,
+      req.post._id,
       { image, content },
       { new: true }
     );
@@ -66,13 +66,13 @@ const posts = {
     handleSuccess(200, msg, res);
   }),
   deleteOne: handleErrorAsync(async (req, res, next) => {
-    const post = await Post.findByIdAndDelete(req.post.id);
+    const post = await Post.findByIdAndDelete(req.post._id);
     const msg = { message: "貼文已刪除" };
     if (post) return handleSuccess(200, msg, res);
   }),
   like: handleErrorAsync(async (req, res, next) => {
     const post = await Post.findByIdAndUpdate(
-      req.post.id,
+      req.post._id,
       { $addToSet: { likes: req.user.id } },
       {
         new: true,
@@ -88,7 +88,7 @@ const posts = {
   }),
   unlike: handleErrorAsync(async (req, res, next) => {
     const post = await Post.findByIdAndUpdate(
-      req.post.id,
+      req.post._id,
       { $pull: { likes: req.user.id } },
       {
         new: true,

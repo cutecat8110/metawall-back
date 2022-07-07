@@ -12,6 +12,9 @@ router.get("/user/profile", isAuth, userCON.getProfile);
 router.patch("/user/profile", isAuth, userCON.updateProfile);
 router.get("/user/likeList", isAuth, userCON.getLikeList);
 
+router.post("/user/:id/follow", isAuth, userCON.follow);
+router.delete("/user/:id/follow", isAuth, userCON.unFollow);
+
 router.get("/users", isAuth, userCON.getAll, userSpec.getAll);
 
 module.exports = router;

@@ -121,6 +121,46 @@ const users = {
     });
     handleSuccess(200, { posts }, res);
   }),
+  follow: handleErrorAsync(async (req, res, next) => {
+    const followID = req.params.id;
+    const userID = req.user.id;
+
+    if (followID == userID)
+      return appError(400, "follow 須為自己以外的對象", next);
+
+    await User.updateOne(
+      { _id: userID, "following.user": { $ne: followID } },
+      {
+        $addToSet: { following: { user: followID } },
+      }
+    );
+    await User.updateOne(
+      { _id: followID, "followers.user": { $ne: userID } },
+      {
+        $addToSet: { followers: { user: userID } },
+      }
+    );
+
+    const msg = { message: "已成功追蹤" };
+    handleSuccess(200, msg, res);
+  }),
+  unFollow: handleErrorAsync(async (req, res, next) => {
+    const unFollowID = req.params.id;
+    const userID = req.user.id;
+
+    if (unFollowID == userID)
+      return appError(400, "unFollow 須為自己以外的對象", next);
+
+    await User.findByIdAndUpdate(userID, {
+      $pull: { following: { user: unFollowID } },
+    });
+    await User.findByIdAndUpdate(unFollowID, {
+      $pull: { followers: { user: userID } },
+    });
+
+    const msg = { message: "已取消追蹤" };
+    handleSuccess(200, msg, res);
+  }),
 };
 
 module.exports = users;
