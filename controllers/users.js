@@ -10,9 +10,23 @@ const appError = require("../service/appError");
 const { generateJwt } = require("../service/auth");
 
 const users = {
+  checkLogin: handleErrorAsync(async (req, res, next) => {
+    const msg = { message: "已登入" };
+    handleSuccess(200, msg, res);
+  }),
   getAll: handleErrorAsync(async (req, res, next) => {
     const users = await User.find();
     handleSuccess(200, { users }, res);
+  }),
+  deleteAll: handleErrorAsync(async (req, res, next) => {
+    const user = await User.deleteMany();
+    if (user.deletedCount == 0) return appError(400, "目前尚無用戶", next);
+
+    const msg = {
+      message: "用戶已刪除",
+      deletedCount: user.deletedCount,
+    };
+    handleSuccess(200, msg, res);
   }),
   sign_up: handleErrorAsync(async (req, res, next) => {
     let { name, email, password } = req.body;

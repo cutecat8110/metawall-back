@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     },
     followers: [
       {
-        user: { type: mongoose.Schema.ObjectId, ref: "user" },
+        user: { type: mongoose.Schema.ObjectId, ref: "User" },
         createdAt: {
           type: Date,
           default: Date.now,
@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema(
     ],
     following: [
       {
-        user: { type: mongoose.Schema.ObjectId, ref: "user" },
+        user: { type: mongoose.Schema.ObjectId, ref: "User" },
         createdAt: {
           type: Date,
           default: Date.now,
@@ -59,6 +59,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const User = mongoose.model("user", userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

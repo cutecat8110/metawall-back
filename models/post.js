@@ -19,7 +19,7 @@ const postSchema = new Schema(
     likes: [
       {
         type: [mongoose.Schema.ObjectId],
-        ref: "user",
+        ref: "User",
       },
     ],
     createdAt: {
