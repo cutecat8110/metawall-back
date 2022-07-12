@@ -30,7 +30,7 @@ router.post(
       type: "base64",
       album: process.env.IMGUR_ALBUM_ID,
     });
-
+    console.log(response)
     const msg = {
       message: "圖片已上傳",
       imgUrl: response.data.link,
