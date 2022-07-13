@@ -48,6 +48,8 @@ const upload = {
     const msg = {
       message: "圖片已上傳",
       imgUrl: response.data.link,
+      width: response.data.width,
+      height: response.data.height,
     };
     handleSuccess(200, msg, res);
   }),
