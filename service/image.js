@@ -9,7 +9,10 @@ const checkSpec = {
     fileFilter(req, file, cb) {
       const ext = path.extname(file.originalname).toLowerCase();
       if (ext !== ".jpg" && ext !== ".png" && ext !== ".jpeg") {
-        cb(new Error("檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。"));
+        const error = new Error("檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。");
+        error.statusCode = 400;
+        error.isOperational = true;
+        cb(error);
       }
       cb(null, true);
     },
@@ -21,7 +24,10 @@ const checkSpec = {
     fileFilter(req, file, cb) {
       const ext = path.extname(file.originalname).toLowerCase();
       if (ext !== ".jpg" && ext !== ".png" && ext !== ".jpeg") {
-        cb(new Error("檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。"));
+        const error = new Error("檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。");
+        error.statusCode = 400;
+        error.isOperational = true;
+        cb(error);
       }
       cb(null, true);
     },

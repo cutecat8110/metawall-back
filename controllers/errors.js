@@ -46,6 +46,10 @@ const errors = {
       err.message = `${err.kind} 未填寫正確`;
       err.isOperational = true;
     }
+    if (err.name === "MulterError" && err.message === "File too large") {
+      err.message = `圖片檔案過大，僅限 1mb 以下檔案`;
+      err.isOperational = true;
+    }
     resProd(err, res);
     next();
   },
