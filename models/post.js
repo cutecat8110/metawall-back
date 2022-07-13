@@ -5,7 +5,7 @@ const postSchema = new Schema(
   {
     user: {
       type: mongoose.Schema.ObjectId,
-      ref: "user",
+      ref: "User",
       required: [true, "請輸入 user ID"],
     },
     image: {

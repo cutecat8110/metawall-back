@@ -7,12 +7,12 @@ const commentSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.ObjectId,
-      ref: "user",
+      ref: "User",
       require: [true, "請輸入 user ID"],
     },
     post: {
       type: mongoose.Schema.ObjectId,
-      ref: "post",
+      ref: "Post",
       require: [true, "請輸入 post ID"],
     },
     createdAt: {
