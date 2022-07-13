@@ -50,6 +50,10 @@ const errors = {
       err.message = `圖片檔案過大，僅限 1mb 以下檔案`;
       err.isOperational = true;
     }
+    if (err.message === "檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。") {
+      err.message = `檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。`;
+      err.isOperational = true;
+    }
     resProd(err, res);
     next();
   },
