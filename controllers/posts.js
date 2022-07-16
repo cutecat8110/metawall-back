@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const handleSuccess = require("../service/handleSuccess");
 
 const handleErrorAsync = require("../service/handleErrorAsync");
@@ -119,9 +120,18 @@ const posts = {
   }),
   getAll: handleErrorAsync(async (req, res, next) => {
     const q =
-      req.query.q !== undefined ? { content: new RegExp(req.query.q) } : {};
+      req.query.q !== undefined ? { content: new RegExp(req.query.q) } : undefined;
     const timeSort = req.query.timeSort == "asc" ? "createdAt" : "-createdAt";
-    const posts = await Post.find(q)
+    let p = undefined
+    if (req.query.p !== undefined) {
+      if (!mongoose.isValidObjectId(req.query.p)) return appError(400, "p 須符合 mongoose ObjectId 格式", next);
+      p = { user: req.query.p }
+    }
+    const filter = {
+      ...q,
+      ...p
+    }
+    const posts = await Post.find(filter)
       .populate({
         path: "user",
         select: "name photo",
