@@ -99,16 +99,16 @@ const users = {
     generateJwt(user, 201, res);
   }),
   getProfile: handleErrorAsync(async (req, res, next) => {
-    const { id } = req.params;
+    const { p } = req.query;
 
-    if (!id) {
+    if (!p) {
       const msg = { user: req.user };
-      handleSuccess(200, msg, res);
+      return handleSuccess(200, msg, res);
     }
 
-    if (!mongoose.isValidObjectId(id)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
+    if (!mongoose.isValidObjectId(p)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
 
-    const user = await User.findById(id)
+    const user = await User.findById(p)
     if (!user) return appError(400, "用戶不存在", next);
 
     const msg = { user: user };
