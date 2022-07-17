@@ -9,7 +9,7 @@ router.post("/user/sign_in", userCON.sign_in, userSpec.sign_in);
 
 router.get("/user/checkLogin", isAuth, userCON.checkLogin);
 router.patch("/user/updatePassword", isAuth, userCON.updatePassword);
-router.get("/user/profile", isAuth, userCON.getProfile);
+router.get("/user/profile/:id", isAuth, userCON.getProfile);
 router.patch("/user/profile", isAuth, userCON.updateProfile);
 router.get("/user/likeList", isAuth, userCON.getLikeList);
 

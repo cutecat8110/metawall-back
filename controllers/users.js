@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const handleSuccess = require("../service/handleSuccess");
 const handleErrorAsync = require("../service/handleErrorAsync");
 const User = require("../models/user");
@@ -98,7 +99,15 @@ const users = {
     generateJwt(user, 201, res);
   }),
   getProfile: handleErrorAsync(async (req, res, next) => {
-    const msg = { user: req.user };
+    const { id } = req.params;
+
+    if (!id) return appError(400, "請輸入 user id", next);
+    if (!mongoose.isValidObjectId(id)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
+    
+    const user = await User.findById(id)
+    if (!user) return appError(400, "用戶不存在", next);
+
+    const msg = { user: user };
     handleSuccess(200, msg, res);
   }),
   updateProfile: handleErrorAsync(async (req, res, next) => {
