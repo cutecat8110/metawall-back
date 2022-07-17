@@ -101,9 +101,13 @@ const users = {
   getProfile: handleErrorAsync(async (req, res, next) => {
     const { id } = req.params;
 
-    if (!id) return appError(400, "請輸入 user id", next);
+    if (!id) {
+      const msg = { user: req.user };
+      handleSuccess(200, msg, res);
+    }
+
     if (!mongoose.isValidObjectId(id)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
-    
+
     const user = await User.findById(id)
     if (!user) return appError(400, "用戶不存在", next);
 
