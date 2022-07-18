@@ -28,7 +28,10 @@ const auth = {
         }
       });
     });
-    const currentUser = await User.findById(decoded.id);
+    const currentUser = await User.findById(decoded.id).populate({
+          path: "following.user",
+          select: "name photo",
+        });
     req.user = currentUser;
     next();
   }),

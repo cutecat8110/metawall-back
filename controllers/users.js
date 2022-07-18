@@ -109,6 +109,7 @@ const users = {
     if (!mongoose.isValidObjectId(p)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
 
     const user = await User.findById(p)
+
     if (!user) return appError(400, "用戶不存在", next);
 
     const msg = { user: user };
