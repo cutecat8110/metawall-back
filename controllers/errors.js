@@ -47,6 +47,7 @@ const errors = {
       err.isOperational = true;
     }
     if (err.name === "MulterError" && err.message === "File too large") {
+      err.statusCode = 400;
       if (req.url === "/upload/avatar")
         err.message = `圖片檔案過大，僅限 2mb 以下檔案`;
       if (req.url === "/upload/post")
