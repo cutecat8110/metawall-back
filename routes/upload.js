@@ -16,7 +16,7 @@ router.post(
 router.post(
   "/post",
   isAuth,
-  checkSpec.avatar,
+  checkSpec.post,
   uploadsCON.checkFiles,
   uploadsCON.post
 );
