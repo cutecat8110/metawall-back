@@ -1,91 +1,217 @@
 const posts = {
-  getAll: () => {
-    /*
-    #swagger.tags = ['Posts - 貼文']
-    #swagger.description = '取得所有貼文'
-    #swagger.responses[200] = {
-      description: '貼文資訊',
-      schema: {
-        "status": "success",
-        "data": [
-          {
-            "_id": "6293b29dc213ea2a2264511e",
-            "user": {
-              "_id": "6284bd0df623a5fcf56630f0",
-              "name": "John",
-              "photo": "https://thumb.fakeface.rest/thumb_male_10_8c02e4e9bdc0e103530691acfca605f18caf1766.jpg"
-            },
-            "image": "",
-            "content": "123",
-            "likes": 0,
-            "comments": 0,
-            "createdAt": "2022-05-29T17:51:25.670Z"
-          }
-        ]
-      }
-    }
-   */
-  },
   create: () => {
-    /*
-      #swagger.tags = ['Posts - 貼文']
-      #swagger.parameters['body'] = {
-        in: 'body',
-        type: 'object',
-        description: '資料格式',
-        required: true,
-        schema: {
-          $user: '6284bd0df623a5fcf56630f0',
-          $content: '這是一段話',
-          image: '',
-        }
+    /* 
+    #swagger.tags = ['Posts']
+    #swagger.description = '新增貼文'
+    #swagger.security = [
+      {
+        apiKeyAuth: [],
+      },
+    ];
+    #swagger.parameters["body"] = {
+      in: 'body',
+      type: 'object',
+      description: '資料格式',
+      required: true,
+      schema: {
+        $content: "測試",
+        image: "",
       }
-      #swagger.responses[200] = {
-        description: '貼文資訊',
-        schema: {
-          "status": "success",
-          "data": {
-            "user": "6284bd0df623a5fcf56630f0",
-            "image": "",
-            "content": "這是一段話",
-            "likes": 0,
-            "comments": 0,
-            "_id": "6295e0f362a9aa864d5746a4",
-            "createdAt": "2022-05-31T09:33:39.656Z"
-          }
-        }
-      }
+    };
+    #swagger.responses[201] = {
+      schema: {
+        status: "success",
+        message: "貼文已創建",
+        post: {
+          user: "62d8b0456f6829d341ffa6b5",
+          image: "",
+          content: "測試",
+          likes: [],
+          _id: "62da10ba466951791dfb2d1a",
+          createdAt: "2022-07-22T02:51:38.102Z",
+        },
+      },
+    };
+    #swagger.responses[400] = {
+      description: "Bad Request",
+      schema: { $ref: '#/definitions/error400' },
+    };
     */
   },
-  deleteAll: () => {
-    /**
-     * #swagger.tags = ['Posts - 貼文']
-     */
-  },
   getOne: () => {
-    /*
-    #swagger.tags = ['Posts - 貼文']
-    $swagger.parameters['id'] ={
-      in: 'path',
-      type: 'string',
-      required: true
-    }
-   */
-  },
-  deleteOne: () => {
-    /**
-     * #swagger.tags = ['Posts - 貼文']
-     */
-  },
-  update: () => {
-    /**
-     * #swagger.tags = ['Posts - 貼文']
-     */
+    /* 
+    #swagger.tags = ['Posts']
+    #swagger.description = '取得單一貼文'
+    #swagger.security = [
+      {
+        apiKeyAuth: [],
+      },
+    ];
+    #swagger.parameters["id"] = {
+      description: "Post ID",
+    };
+    #swagger.responses[200] = {
+      schema: {
+        status: "success",
+        post: {
+          _id: "62da10ba466951791dfb2d1a",
+          user: {
+            _id: "62d8b0456f6829d341ffa6b5",
+            name: "小貓咪船長",
+            photo: "https://i.imgur.com/PjN4yOu.png",
+          },
+          image: "",
+          content: "測試",
+          likes: [],
+          createdAt: "2022-07-22T02:51:38.102Z",
+          comments: [],
+        },
+      },
+    };
+    #swagger.responses[400] = {
+      description: "Bad Request",
+      schema: { $ref: '#/definitions/error400' },
+    };
+    */
   },
   like: () => {
-    /**
-     * #swagger.tags = ['Posts - 貼文']
-     */
+    /* 
+    #swagger.tags = ['Posts']
+    #swagger.description = '按讚'
+    #swagger.security = [
+      {
+        apiKeyAuth: [],
+      },
+    ];
+    #swagger.parameters["id"] = {
+      description: "Post ID",
+    };
+    #swagger.responses[200] = {
+      schema: {
+        status: "success",
+        message: "已按讚",
+        postId: "62da10ba466951791dfb2d1a",
+        userId: "62d8b0456f6829d341ffa6b5",
+      },
+    };
+    #swagger.responses[400] = {
+      description: "Bad Request",
+      schema: { $ref: '#/definitions/error400' },
+    };
+    */
+  },
+  unlike: () => {
+    /* 
+    #swagger.tags = ['Posts']
+    #swagger.description = '取消按讚'
+    #swagger.security = [
+      {
+        apiKeyAuth: [],
+      },
+    ];
+    #swagger.parameters["id"] = {
+      description: "Post ID",
+    };
+    #swagger.responses[200] = {
+      schema: {
+        status: "success",
+        message: "已取消按讚",
+        postId: "62da10ba466951791dfb2d1a",
+        userId: "62d8b0456f6829d341ffa6b5",
+      },
+    };
+    #swagger.responses[400] = {
+      description: "Bad Request",
+      schema: { $ref: '#/definitions/error400' },
+    };
+    */
+  },
+  comment: () => {
+    /* 
+    #swagger.tags = ['Posts']
+    #swagger.description = '留言'
+    #swagger.security = [
+      {
+        apiKeyAuth: [],
+      },
+    ];
+    #swagger.parameters["id"] = {
+      description: "Post ID",
+    };
+    #swagger.parameters["body"] = {
+      in: 'body',
+      type: 'object',
+      description: '資料格式',
+      required: true,
+      schema: {
+        $comment: "留言",
+      }
+    };
+    #swagger.responses[200] = {
+      schema: {
+        status: "success",
+        message: "已留言",
+        comment: {
+          comment: "留言",
+          user: "62d8b0456f6829d341ffa6b5",
+          post: "62da10ba466951791dfb2d1a",
+          _id: "62da1390c490be896b7fd8cc",
+          createdAt: "2022-07-22T03:03:44.143Z",
+        },
+      },
+    };
+    #swagger.responses[400] = {
+      description: "Bad Request",
+      schema: { $ref: '#/definitions/error400' },
+    };
+    */
+  },
+  getAll: () => {
+    /* 
+    #swagger.tags = ['Posts']
+    #swagger.description = '取得所有貼文'
+    #swagger.security = [
+      {
+        apiKeyAuth: [],
+      },
+    ];
+    #swagger.responses[200] = {
+      schema: {
+        status: "success",
+        posts: [
+          {
+            _id: "62da10ba466951791dfb2d1a",
+            user: {
+              _id: "62d8b0456f6829d341ffa6b5",
+              name: "小貓咪船長",
+              photo: "https://i.imgur.com/PjN4yOu.png",
+            },
+            image: "",
+            content: "測試",
+            likes: [],
+            createdAt: "2022-07-22T02:51:38.102Z",
+            comments: [
+              {
+                _id: "62da1390c490be896b7fd8cc",
+                comment: "456",
+                user: {
+                  _id: "62d8b0456f6829d341ffa6b5",
+                  name: "小貓咪船長",
+                  photo: "https://i.imgur.com/PjN4yOu.png",
+                  createdAt: "2022-07-21T01:47:49.529Z",
+                },
+                post: "62da10ba466951791dfb2d1a",
+              },
+            ],
+          },
+        ],
+      },
+    };
+    #swagger.responses[400] = {
+      description: "Bad Request",
+      schema: { $ref: '#/definitions/error400' },
+    };
+    */
   },
 };
 

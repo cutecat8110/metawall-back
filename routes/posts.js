@@ -17,15 +17,15 @@ router.patch(
   "/post/:id",
   isAuth,
   postsCON.checkPost,
-  postsCON.update,
-  postsSpec.update
+  postsCON.update
+  /* #swagger.ignore = true */
 );
 router.delete(
   "/post/:id",
   isAuth,
   postsCON.checkPost,
-  postsCON.deleteOne,
-  postsSpec.deleteOne
+  postsCON.deleteOne
+  /* #swagger.ignore = true */
 );
 router.post(
   "/post/:id/likes",
@@ -39,17 +39,23 @@ router.delete(
   isAuth,
   postsCON.checkPost,
   postsCON.unlike,
-  postsSpec.like
+  postsSpec.unlike
 );
 router.post(
   "/post/:id/comment",
   isAuth,
   postsCON.checkPost,
   postsCON.comment,
+  postsSpec.comment
 );
 
 // posts 所有
 router.get("/posts", isAuth, postsCON.getAll, postsSpec.getAll);
-router.delete("/posts", isAuth, postsCON.deleteAll, postsSpec.deleteAll);
+router.delete(
+  "/posts",
+  isAuth,
+  postsCON.deleteAll
+  /* #swagger.ignore = true */
+);
 
 module.exports = router;

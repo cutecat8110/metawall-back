@@ -3,6 +3,7 @@ const handleErrorAsync = require("../service/handleErrorAsync");
 const appError = require("../service/appError");
 const sizeOf = require("image-size");
 const { ImgurClient } = require("imgur");
+const uploadSpec = require("../specs/upload");
 
 const upload = {
   checkFiles: handleErrorAsync(async (req, res, next) => {
@@ -25,7 +26,7 @@ const upload = {
       type: "base64",
       album: process.env.IMGUR_ALBUM_ID,
     });
-    console.log(response)
+
     const msg = {
       message: "圖片已上傳",
       imgUrl: response.data.link,
@@ -44,12 +45,10 @@ const upload = {
       type: "base64",
       album: process.env.IMGUR_ALBUM_2_ID,
     });
-    console.log(response)
+
     const msg = {
       message: "圖片已上傳",
       imgUrl: response.data.link,
-      width: response.data.width,
-      height: response.data.height,
     };
     handleSuccess(200, msg, res);
   }),

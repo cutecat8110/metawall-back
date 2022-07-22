@@ -3,7 +3,7 @@ const router = express.Router();
 const { isAuth } = require("../service/auth");
 const checkSpec = require("../service/image");
 const uploadsCON = require("../controllers/uploads");
-
+const uploadSpec = require("../specs/upload");
 
 // 上傳
 router.post(
@@ -11,14 +11,16 @@ router.post(
   isAuth,
   checkSpec.avatar,
   uploadsCON.checkFiles,
-  uploadsCON.avatar
+  uploadsCON.avatar,
+  uploadSpec.avatar
 );
 router.post(
   "/post",
   isAuth,
   checkSpec.post,
   uploadsCON.checkFiles,
-  uploadsCON.post
+  uploadsCON.post,
+  uploadSpec.post
 );
 
 module.exports = router;

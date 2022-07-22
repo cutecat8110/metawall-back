@@ -96,7 +96,7 @@ const users = {
     const user = await User.findByIdAndUpdate(req.user.id, {
       password: newPassword,
     });
-    generateJwt(user, 201, res);
+    generateJwt(user, 200, res);
   }),
   getProfile: handleErrorAsync(async (req, res, next) => {
     const { p } = req.query;
