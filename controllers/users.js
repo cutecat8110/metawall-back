@@ -69,7 +69,7 @@ const users = {
     if (typeof email !== "string" || typeof password !== "string" || !email.trim() || !password)
       return appError(400, "請輸入 email 和 password", next);
     email = email.trim().toLowerCase();
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password +passwordVersion");
     // 用戶需存在
     if (!user) return appError(400, "email 或 password 錯誤", next);
     // password 需正確
@@ -97,8 +97,10 @@ const users = {
 
     const newPassword = await bcrypt.hash(password, 12);
     const user = await User.findByIdAndUpdate(req.user.id, {
-      password: newPassword,
-    });
+      $set: { password: newPassword },
+      $inc: { passwordVersion: 1 },
+    }, { new: true }).select("+passwordVersion");
+    if (!user) return appError(401, "用戶不存在，請重新登入", next);
     generateJwt(user, 200, res);
   }),
   getProfile: handleErrorAsync(async (req, res, next) => {

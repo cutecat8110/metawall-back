@@ -40,3 +40,17 @@
 - 2 張測試圖片已透過原 Render 環境刪除，各回 200 / success true；本機 Imgur API 曾拒絕刪圖，沒有將外部拒絕誤判為成功。臨時清理指令完成後恢復 `npm start`。
 - 詳細驗收、精確 QA ID 與前端產物對照：[前端紀錄](https://github.com/cutecat8110/metawall-front/blob/portfolio/qa/qa/live-verification.json)。
 - 回復基準仍為 `main` / `37b42ed888dc85809a4eff66e889a2529780446a`，原 build `npm install`、start `npm start`；本輪未需回復。
+
+## 2026-10-08 複查補修
+
+本輪基準：`fcbefa9`；範圍為密碼更新的登入撤銷、後端依賴安全修補。API 問題與螢幕尺寸無關。保留 Express 4、Mongoose 6、既有 API 路徑及回應格式。
+
+| 編號 | 重現步驟與影響 | 原因與修正 | 驗證結果 |
+| --- | --- | --- | --- |
+| B-08 | 登入取得 token → 改密碼 → 使用原 token 呼叫 checkLogin，原先仍回 200，其他裝置仍可存取 | 新增隱藏的 passwordVersion；每次改密碼原子遞增，JWT 比對版本；限定 HS256。既有資料與舊 token 的缺省版本為 0，不需批次遷移，改密碼後即失效 | 隔離 MongoDB：舊／舊格式 token 均回 401，原 token 不能修改資料；新 token 與重新登入正常，連續改密碼各自撤銷前一版本；內部版本不出現在 profile |
+| B-09 | npm audit --omit=dev 原有 22 項警告，包含 Express/body-parser、Mongoose 與 JWT 等已知風險版本 | 固定 Express 4.22.3、Mongoose 6.13.11、jsonwebtoken 9.0.3、Imgur 2.6.1、cookie-parser 1.4.7、morgan 1.12.1、validator 13.15.35；更新相容的傳遞依賴及 lockfile | Node 22.23.3 乾淨 npm ci 通過，完整及正式依賴 audit 均為 0；16 項 API 整合測試通過。實際 Imgur SDK 的 refresh-token 與 multipart 組裝也由受控 HTTP transport 驗證，不只 mock upload 方法 |
+
+- 與前端正式建置連接隔離 API，驗證登入、Enter 留言、按讚、追蹤及清單；沒有更動既有線上會員或內容。
+- 本輪沒有進行真機測試；瀏覽器選檔仍受 Chrome 擴充功能權限限制。圖片驗證包含 API 格式／大小／比例／損壞、SDK 認證與上傳序列化、上游錯誤恢復，未將 mock 測試宣稱為新增的真實 Imgur 上傳。
+- 回復基準：Render 前一個成功部署 `dep-db3eg3uq1p3s73f55l90` / `fcbefa9`。發布順序仍為後端成功後才發布前端。
+- 安全參考：[body-parser 公告](https://github.com/expressjs/body-parser/security/advisories/GHSA-qwcr-r2fm-qrc7)、[JWT v9 遷移說明](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v8-to-v9)。

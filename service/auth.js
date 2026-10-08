@@ -12,16 +12,20 @@ const auth = {
     }
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ["HS256"] });
     } catch (err) {
       return appError(401, err.name === "TokenExpiredError" ? "認證已過期，請重新登入" : "無效簽證，請重新登入", next);
     }
     if (!mongoose.isObjectIdOrHexString(decoded.id)) return appError(401, "無效簽證，請重新登入", next);
-    const currentUser = await User.findById(decoded.id).populate({
+    const currentUser = await User.findById(decoded.id).select("+passwordVersion").populate({
           path: "following.user",
           select: "name photo",
         });
     if (!currentUser) return appError(401, "用戶不存在，請重新登入", next);
+    // Tokens issued before this field existed represent version zero.
+    if ((decoded.passwordVersion ?? 0) !== (currentUser.passwordVersion ?? 0))
+      return appError(401, "密碼已更新，請重新登入", next);
+    currentUser.passwordVersion = undefined;
     req.user = currentUser;
     next();
   }),
@@ -30,8 +34,9 @@ const auth = {
     next();
   },
   generateJwt: (user, statusCode, res) => {
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id, passwordVersion: user.passwordVersion ?? 0 }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_DAY,
+      algorithm: "HS256",
     });
     user.password = undefined;
     res.status(statusCode).json({

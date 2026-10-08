@@ -6,7 +6,7 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 let mongo, app, a, b, User, Post, Comment;
 const password = 'OnlyLocalQa123';
-const token = user => `Bearer ${jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })}`;
+const token = user => `Bearer ${jwt.sign({ id: user._id, passwordVersion: user.passwordVersion ?? 0 }, process.env.JWT_SECRET, { expiresIn: '1h' })}`;
 before(async () => {
   mongo = await MongoMemoryServer.create();
   process.env.DATABASE = mongo.getUri('metawall_qa');
@@ -84,6 +84,36 @@ test('profile and password updates persist; old password stops working', async (
   await request(app).patch('/user/updatePassword').set('Authorization',token(a)).send({password:'AnotherLocal123',confirmPassword:'AnotherLocal123'}).expect(200);
   await request(app).post('/user/sign_in').send({email:'alice@example.test',password}).expect(400);
   await request(app).post('/user/sign_in').send({email:'alice@example.test',password:'AnotherLocal123'}).expect(200);
+  a = await User.findById(a.id).select('+passwordVersion');
+});
+test('password changes revoke every older session, including legacy tokens, without exposing the version', async () => {
+  const signed = await request(app).post('/user/sign_up').send({name:'Session QA',email:'sessions@example.test',password}).expect(201);
+  const original = `Bearer ${signed.body.user.token}`;
+  const user = await User.findOne({email:'sessions@example.test'});
+  // An existing database record may predate the new optional version field.
+  await User.collection.updateOne({_id:user._id}, {$unset:{passwordVersion:''}});
+  const legacy = `Bearer ${jwt.sign({id:user.id},process.env.JWT_SECRET,{expiresIn:'1h'})}`;
+  await request(app).get('/user/checkLogin').set('Authorization',legacy).expect(200);
+  const first = await request(app).patch('/user/updatePassword').set('Authorization',original)
+    .send({password:'NewSession123',confirmPassword:'NewSession123'}).expect(200);
+  const fresh = `Bearer ${first.body.user.token}`;
+  for (const expired of [legacy, original]) {
+    await request(app).get('/user/checkLogin').set('Authorization',expired).expect(401);
+    await request(app).patch('/user/profile').set('Authorization',expired).send({name:'Blocked'}).expect(401);
+  }
+  const profile = await request(app).get('/user/profile').set('Authorization',fresh).expect(200);
+  assert.equal(profile.body.user.passwordVersion,undefined);
+  assert.equal(profile.body.user.password,undefined);
+  const login = await request(app).post('/user/sign_in').send({email:'sessions@example.test',password:'NewSession123'}).expect(200);
+  await request(app).get('/user/checkLogin').set('Authorization',`Bearer ${login.body.user.token}`).expect(200);
+  // Consecutive changes must work even within the same JWT timestamp second.
+  const second = await request(app).patch('/user/updatePassword').set('Authorization',fresh)
+    .send({password:'ThirdSession456',confirmPassword:'ThirdSession456'}).expect(200);
+  assert.equal(jwt.decode(second.body.user.token).passwordVersion,2);
+  await request(app).get('/user/checkLogin').set('Authorization',fresh).expect(401);
+  await request(app).get('/user/checkLogin').set('Authorization',`Bearer ${second.body.user.token}`).expect(200);
+  const otherAlgorithm = jwt.sign({id:user.id,passwordVersion:2},process.env.JWT_SECRET,{algorithm:'HS384'});
+  await request(app).get('/user/checkLogin').set('Authorization',`Bearer ${otherAlgorithm}`).expect(401);
 });
 test('upload rejects missing, wrong format, damaged and oversized files without contacting Imgur', async () => {
   for(const route of ['/upload/avatar','/upload/post']) {
@@ -131,6 +161,29 @@ test('valid image upload keeps the response contract, with recoverable upstream 
   await request(app).post('/upload/post').set('Authorization',token(a)).attach('file-to-upload',png,'qa.png').expect(502);
   mocked.mock.mockImplementation(async()=>{throw new Error('upstream offline')});
   await request(app).post('/upload/avatar').set('Authorization',token(a)).attach('file-to-upload',png,'qa.png').expect(502);
+});
+
+test('updated Imgur SDK refreshes authentication and serializes the real upload request',async(t)=>{
+ const axios=require('axios');const create=axios.create.bind(axios);const calls=[];
+ const keys=['IMGUR_CLIENT_ID','IMGUR_CLIENT_SECRET','IMGUR_REFRESH_TOKEN','IMGUR_ALBUM_2_ID'];
+ const saved=Object.fromEntries(keys.map(key=>[key,process.env[key]]));
+ for(const key of keys) process.env[key]='isolated-'+key;
+ t.mock.method(axios,'create',options=>create({...options,adapter:async config=>{
+  calls.push(config.url);
+  if(config.url==='oauth2/token') {
+   assert.equal(JSON.parse(config.data).grant_type,'refresh_token');
+   return {status:200,config,data:{access_token:'isolated-access',refresh_token:'isolated-refresh'}};
+  }
+  assert.equal(config.headers.get('authorization'),'Bearer isolated-access');
+  const multipart=config.data.getBuffer().toString();
+  assert.ok(multipart.includes('name="image"'));assert.ok(multipart.includes('isolated-IMGUR_ALBUM_2_ID'));
+  return {status:200,config,data:{success:true,data:{link:'https://i.imgur.com/isolated-sdk-test.png'}}};
+ }}));
+ try {
+  const png=await require('sharp')({create:{width:16,height:16,channels:3,background:'#baccdf'}}).png().toBuffer();
+  const res=await request(app).post('/upload/post').set('Authorization',token(a)).attach('file-to-upload',png,'sdk.png').expect(200);
+  assert.equal(res.body.imgUrl,'https://i.imgur.com/isolated-sdk-test.png');assert.equal(calls.length,2);
+ } finally {for(const key of keys) {if(saved[key]===undefined)delete process.env[key];else process.env[key]=saved[key];}}
 });
 
 test('only an existing admin role can reach bulk deletion (isolated database only)',async()=>{

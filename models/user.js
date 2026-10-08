@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
       minlength: 8,
       select: false,
     },
+    passwordVersion: { type: Number, default: 0, select: false },
     createdAt: {
       type: Date,
       default: Date.now,

@@ -138,3 +138,5 @@
     </tr>
   </tbody>
 </table>
+
+密碼更新會撤銷所有先前 token，並回傳目前裝置可使用的新 token。舊會員不需要資料遷移；未設定的 passwordVersion 視為 0，僅在改密碼時原子遞增。後端正式依賴可用 `npm audit --omit=dev` 複查。
