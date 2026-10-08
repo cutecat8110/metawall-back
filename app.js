@@ -9,8 +9,6 @@ const swaggerDocument = require("./swagger-output.json");
 require("./connections");
 
 const errorCON = require("./controllers/errors");
-errorCON.uncaughtException;
-errorCON.unhandledRejection;
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");

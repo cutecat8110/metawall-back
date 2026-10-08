@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userCON = require("../controllers/users");
 const userSpec = require("../specs/user");
-const { isAuth } = require("../service/auth");
+const { isAuth, isAdmin } = require("../service/auth");
 
 router.post("/user/sign_up", userCON.sign_up, userSpec.sign_up);
 router.post("/user/sign_in", userCON.sign_in, userSpec.sign_in);
@@ -27,6 +27,6 @@ router.post("/user/:id/follow", isAuth, userCON.follow, userSpec.follow);
 router.delete("/user/:id/follow", isAuth, userCON.unFollow, userSpec.unFollow);
 
 router.get("/users", isAuth, userCON.getAll /* #swagger.ignore = true */);
-router.delete("/users", isAuth, userCON.deleteAll /* #swagger.ignore = true */);
+router.delete("/users", isAuth, isAdmin, userCON.deleteAll /* #swagger.ignore = true */);
 
 module.exports = router;

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const postsCON = require("../controllers/posts");
 const postsSpec = require("../specs/post");
-const { isAuth } = require("../service/auth");
+const { isAuth, isAdmin } = require("../service/auth");
 
 // post 單一
 router.post("/post", isAuth, postsCON.create, postsSpec.create);
@@ -54,6 +54,7 @@ router.get("/posts", isAuth, postsCON.getAll, postsSpec.getAll);
 router.delete(
   "/posts",
   isAuth,
+  isAdmin,
   postsCON.deleteAll
   /* #swagger.ignore = true */
 );

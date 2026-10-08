@@ -25,7 +25,14 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+require('../connections').then(() => {
+  console.log('資料庫連接成功');
+  server.listen(port);
+}).catch(() => {
+  console.error('資料庫連線失敗，請檢查環境設定與連線權限');
+  process.exitCode = 1;
+  require('mongoose').disconnect();
+});
 server.on('error', onError);
 server.on('listening', onListening);
 

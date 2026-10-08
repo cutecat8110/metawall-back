@@ -33,11 +33,13 @@ const users = {
     let { name, email, password } = req.body;
 
     // 欄位必填
-    if (!name || !email || !password)
+    if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string" || !name.trim() || !email.trim() || !password)
       return appError("400", "請輸入 name、email 和 password", next);
+    name = name.trim();
+    email = email.trim().toLowerCase();
     // name 至少 2 碼
-    if (!validator.isLength(name, { min: 2 }))
-      return appError("400", "name 請輸入至少 2 個字元", next);
+    if (!validator.isLength(name, { min: 2, max: 13 }))
+      return appError("400", "name 請輸入 2 至 13 個字元", next);
     // password 須符合格式
     if (!validator.isStrongPassword(password, { minSymbols: 0 }))
       return appError(
@@ -61,11 +63,12 @@ const users = {
     generateJwt(newUser, 201, res);
   }),
   sign_in: handleErrorAsync(async (req, res, next) => {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
 
     // 欄位必填
-    if (!email || !password)
+    if (typeof email !== "string" || typeof password !== "string" || !email.trim() || !password)
       return appError(400, "請輸入 email 和 password", next);
+    email = email.trim().toLowerCase();
     const user = await User.findOne({ email }).select("+password");
     // 用戶需存在
     if (!user) return appError(400, "email 或 password 錯誤", next);
@@ -79,7 +82,7 @@ const users = {
     const { password, confirmPassword } = req.body;
 
     // 欄位必填
-    if (!password || !confirmPassword)
+    if (typeof password !== "string" || typeof confirmPassword !== "string" || !password || !confirmPassword)
       return appError(400, "請輸入 password 和 confirmPassword", next);
     // password 和 confirmPassword 需一致
     if (password !== confirmPassword)
@@ -106,25 +109,28 @@ const users = {
       return handleSuccess(200, msg, res);
     }
 
-    if (!mongoose.isValidObjectId(p)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
+    if (!mongoose.isObjectIdOrHexString(p)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
 
     const user = await User.findById(p)
 
-    if (!user) return appError(400, "用戶不存在", next);
+    if (!user) return appError(404, "用戶不存在", next);
 
     const msg = { user: user };
     handleSuccess(200, msg, res);
   }),
   updateProfile: handleErrorAsync(async (req, res, next) => {
-    const { name, photo, sex } = req.body;
+    let { name, photo, sex } = req.body;
 
     // name 不能為空字串
-    if (name == "") return next(appError(400, "name 不能為空字串", next));
+    if (name !== undefined) {
+      if (typeof name !== "string" || !validator.isLength(name.trim(), {min: 2, max: 13})) return appError(400, "name 請輸入 2 至 13 個字元", next);
+      name = name.trim();
+    }
     // photo 不能為空字串
-    if (photo == "") return next(appError(400, "photo 不能為空字串", next));
+    if (photo !== undefined && (typeof photo !== "string" || !validator.isURL(photo, {protocols: ["http", "https"], require_protocol: true}))) return appError(400, "photo 須為圖片網址", next);
     // sex 須符合枚舉
-    if (sex !== undefined && !validator.isIn(sex, ["male", "female"]))
-      return next(appError(400, "sex 須符合枚舉 male 或 female", next));
+    if (sex !== undefined && (typeof sex !== "string" || !validator.isIn(sex, ["male", "female"])))
+      return appError(400, "sex 須符合枚舉 male 或 female", next);
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -153,6 +159,9 @@ const users = {
     const followID = req.params.id;
     const userID = req.user.id;
 
+    if (!mongoose.isObjectIdOrHexString(followID)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
+    if (!(await User.exists({_id: followID}))) return appError(404, "用戶不存在", next);
+
     if (followID == userID)
       return appError(400, "follow 須為自己以外的對象", next);
 
@@ -175,6 +184,9 @@ const users = {
   unFollow: handleErrorAsync(async (req, res, next) => {
     const unFollowID = req.params.id;
     const userID = req.user.id;
+
+    if (!mongoose.isObjectIdOrHexString(unFollowID)) return appError(400, "user id 須符合 mongoose ObjectId 格式", next);
+    if (!(await User.exists({_id: unFollowID}))) return appError(404, "用戶不存在", next);
 
     if (unFollowID == userID)
       return appError(400, "unFollow 須為自己以外的對象", next);

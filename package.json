@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "start:dev": "cross-env NODE_ENV=dev nodemon ./bin/www",
-    "start:production": "cross-env NODE_ENV=production nodemon ./bin/www",
-    "swagger": "node ./swagger.js"
+    "start:dev": "node --env-file-if-exists=config.env --watch ./bin/www",
+    "start:production": "node --env-file-if-exists=config.env ./bin/www",
+    "swagger": "node ./swagger.js",
+    "test": "node --test tests/*.test.js",
+    "qa:serve": "node tests/serve-qa.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -15,18 +17,23 @@
     "debug": "~2.6.9",
     "dotenv": "^16.0.1",
     "express": "~4.16.1",
-    "image-size": "^1.0.1",
     "imgur": "^2.2.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.3",
     "morgan": "~1.9.1",
     "multer": "^1.4.5-lts.1",
+    "sharp": "0.35.5",
     "swagger-autogen": "^2.21.2",
     "swagger-ui-express": "^4.4.0",
     "tslib": "^2.4.0",
     "validator": "^13.7.0"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "mongodb-memory-server": "10.4.3",
+    "supertest": "7.3.1"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }

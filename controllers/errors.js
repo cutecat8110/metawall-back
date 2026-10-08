@@ -1,77 +1,28 @@
-const resProd = (err, res) => {
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
-  } else {
-    console.error("出現重大錯誤", err);
-    res.status(500).json({
-      status: "error",
-      message: "系統錯誤，請恰系統管理員",
-    });
+const errors = {
+  error404: (req, res) => res.status(404).json({ status: 'error', message: '無此頁面資訊' }),
+  error: (err, req, res, next) => {
+    if (res.headersSent) return next(err);
+    let status = Number(err.statusCode || err.status) || 500;
+    let message = err.message;
+    let known = err.isOperational || false;
+    if (err.name === 'ValidationError' || err.name === 'CastError') {
+      status = 400; known = true;
+      message = err.name === 'ValidationError' ? `${Object.keys(err.errors)} 欄位未填寫正確` : `${err.kind} 未填寫正確`;
+    }
+    if (err.code === 11000) { status = 400; known = true; message = 'email 已被註冊'; }
+    if (err.name === 'MulterError') {
+      status = 400; known = true;
+      message = err.code === 'LIMIT_FILE_SIZE'
+        ? `圖片檔案過大，僅限 ${req.originalUrl.split('?')[0] === '/upload/avatar' ? '2' : '1'}mb 以下檔案`
+        : '請選擇一張圖片';
+    }
+    if (err.type === 'entity.parse.failed') { status = 400; known = true; message = 'JSON 格式錯誤'; }
+    if (!known) {
+      console.error('API error:', err.name);
+      message = '系統錯誤，請稍後再試';
+      status = 500;
+    }
+    return res.status(status).json({ status: 'error', message });
   }
 };
-
-const resDev = (err, res) => {
-  res.status(err.statusCode).json({
-    message: err.message,
-    error: err,
-    stack: err.stack,
-  });
-};
-
-const errors = {
-  // 404
-  error404: (req, res, next) => {
-    res.status(404).json({
-      status: "error",
-      message: "無此頁面資訊",
-    });
-    next();
-  },
-  // 錯誤處理
-  error: (err, req, res, next) => {
-    err.statusCode = err.statusCode || 500;
-    err.status = err.status || "error";
-
-    if (process.env.NODE_ENV === "dev") return resDev(err, res);
-
-    if (err.name === "ValidationError") {
-      const key = Object.keys(err.errors).toString();
-      err.message = `${key} 欄位未填寫正確`;
-      err.isOperational = true;
-    }
-    if (err.name === "CastError") {
-      err.message = `${err.kind} 未填寫正確`;
-      err.isOperational = true;
-    }
-    if (err.name === "MulterError" && err.message === "File too large") {
-      err.statusCode = 400;
-      if (req.url === "/upload/avatar")
-        err.message = `圖片檔案過大，僅限 2mb 以下檔案`;
-      if (req.url === "/upload/post")
-        err.message = `圖片檔案過大，僅限 1mb 以下檔案`;
-      err.isOperational = true;
-    }
-    if (err.message === "檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。") {
-      err.message = `檔案格式錯誤，僅限上傳 jpg、jpeg 與 png 格式。`;
-      err.isOperational = true;
-    }
-    resProd(err, res);
-    next();
-  },
-  // 捕捉程式重大錯誤
-  uncaughtException: process.on("uncaughtException", (err) => {
-    console.error("Uncaughted Exception！");
-    console.error(err.name);
-    console.error(err.message);
-    process.exit(1);
-  }),
-  // 未捕捉到的 catch
-  unhandledRejection: process.on("unhandledRejection", (reason, promise) => {
-    console.error("未捕捉到的 rejection：", promise, "原因：", reason);
-  }),
-};
-
 module.exports = errors;

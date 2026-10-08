@@ -8,12 +8,12 @@ const commentSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
-      require: [true, "請輸入 user ID"],
+      required: [true, "請輸入 user ID"],
     },
     post: {
       type: mongoose.Schema.ObjectId,
       ref: "Post",
-      require: [true, "請輸入 post ID"],
+      required: [true, "請輸入 post ID"],
     },
     createdAt: {
       type: Date,
