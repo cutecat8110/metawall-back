@@ -24,7 +24,7 @@
 - `npm run qa:serve`：在 `127.0.0.1:8091` 啟動真實 API 與暫存 MongoDB，附兩個本機帳號 `alice@example.test` / `bob@example.test`，密碼 `LocalQa123456`。停止程序即丟棄資料，不具備真實 Imgur 憑證。僅限本機 QA。
 - Render：保留 `metawall_backend` 現有服務及環境變數，來源使用 `portfolio/qa`，build `npm ci`，start `npm start`。部署 Node 22.23.3；先驗證後端，再發布前端。
 - 失敗回復：在 Render 選取上一個成功部署；本輪前基準提交 `37b42ed888dc85809a4eff66e889a2529780446a`，原分支 `main`。
-- 所有寫入均不自動重試。圖片服務故障回覆 502；一般输入／認證／權限／不存在資源分別回覆 400／401／403／404。
+- 所有寫入均不自動重試。圖片服務故障回覆 502；一般輸入／認證／權限／不存在資源分別回覆 400／401／403／404。
 - 批次刪除僅既有 `admin` 可用；線上 QA 不呼叫批次刪除。不要在公開文件或提交放入帳密、token 或資料庫連線秘密。
 
 完整修正、測試與限制請看 [QA_CHANGELOG.md](QA_CHANGELOG.md)。
