@@ -38,7 +38,7 @@
 - 34 次線上 API 檢查通過：登入、無效 token、資料更新、發文／編輯、越權編輯／刪除 403、特殊字搜尋、留言 createdAt、重複按讚／追蹤一致性、取消、密碼更新與原密碼失效、錯誤輸入，以及真實 Imgur 上傳。前端隨後成功發布並完成瀏覽器操作驗收。
 - 精確清除本次 2 位 QA 會員、2 篇貼文、2 則留言及相關關聯。原有 4 位會員、7 篇貼文、32 則留言的 ID 全數保留，筆數回復原值。
 - 2 張測試圖片已透過原 Render 環境刪除，各回 200 / success true；本機 Imgur API 曾拒絕刪圖，沒有將外部拒絕誤判為成功。臨時清理指令完成後恢復 `npm start`。
-- 詳細驗收、精確 QA ID 與前端產物對照：[前端紀錄](https://github.com/cutecat8110/metawall-front/blob/portfolio/qa/qa/live-verification.json)。
+- 詳細驗收、精確 QA ID 與前端產物對照：[前端紀錄](https://github.com/cutecat8110/metawall-front/blob/c1315bcd7a4a5403af6310a9ce11a5245ca023fb/qa/live-verification.json)。
 - 回復基準仍為 `main` / `37b42ed888dc85809a4eff66e889a2529780446a`，原 build `npm install`、start `npm start`；本輪未需回復。
 
 ## 2026-10-08 複查補修
@@ -54,3 +54,8 @@
 - 本輪沒有進行真機測試；瀏覽器選檔仍受 Chrome 擴充功能權限限制。圖片驗證包含 API 格式／大小／比例／損壞、SDK 認證與上傳序列化、上游錯誤恢復，未將 mock 測試宣稱為新增的真實 Imgur 上傳。
 - 回復基準：Render 前一個成功部署 `dep-db3eg3uq1p3s73f55l90` / `fcbefa9`。發布順序仍為後端成功後才發布前端。
 - 安全參考：[body-parser 公告](https://github.com/expressjs/body-parser/security/advisories/GHSA-qwcr-r2fm-qrc7)、[JWT v9 遷移說明](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v8-to-v9)。
+
+## 2026-10-14 · 分支整併
+
+- 將已驗證的 `portfolio/qa` 快轉整併至 `main`，保留全部提交歷史；原主分支基準為 `37b42ed888dc85809a4eff66e889a2529780446a`。
+- 本次不重新改造功能或重建既有前端產物，更新開發／發布分支說明；部署来源與公開靜態檔另行核對。歷史 QA 日期及結果仍保留。
