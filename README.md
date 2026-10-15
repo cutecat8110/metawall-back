@@ -6,6 +6,10 @@
 
 ![](https://cutecat8110.github.io/metawall-front/demo.png)
 
+## 展示帳密保護
+
+共用展示會員的帳密由 API 固定保護，更新回 403；一般會員仍可修改密碼。自己的 profile 提供 `credentialsLocked`，不公開 email。請勿用共用帳號保存個人資訊。
+
 ## 📋 專案概述
 
 此專案旨在增進獨立前後端開發能力，運用 Vue Options API、nodeJS 和 MongoDB 等技術。<br>開發 API 設計反覆進行測試和防呆，以確保系統穩定與安全性。同時著重於切版與動效實現，以提升畫面品質與社交體驗。

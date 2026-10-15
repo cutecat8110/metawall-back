@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const appError = require("../service/appError");
 const handleErrorAsync = require("../service/handleErrorAsync");
+const { isDemoAccount } = require("./demoAccount");
 
 const auth = {
   isAuth: handleErrorAsync(async (req, res, next) => {
@@ -17,7 +18,7 @@ const auth = {
       return appError(401, err.name === "TokenExpiredError" ? "認證已過期，請重新登入" : "無效簽證，請重新登入", next);
     }
     if (!mongoose.isObjectIdOrHexString(decoded.id)) return appError(401, "無效簽證，請重新登入", next);
-    const currentUser = await User.findById(decoded.id).select("+passwordVersion").populate({
+    const currentUser = await User.findById(decoded.id).select("+passwordVersion +email").populate({
           path: "following.user",
           select: "name photo",
         });
@@ -26,6 +27,8 @@ const auth = {
     if ((decoded.passwordVersion ?? 0) !== (currentUser.passwordVersion ?? 0))
       return appError(401, "密碼已更新，請重新登入", next);
     currentUser.passwordVersion = undefined;
+    req.credentialsLocked = isDemoAccount(currentUser.email);
+    currentUser.email = undefined;
     req.user = currentUser;
     next();
   }),

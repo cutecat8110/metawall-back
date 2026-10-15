@@ -186,6 +186,30 @@ test('updated Imgur SDK refreshes authentication and serializes the real upload 
  } finally {for(const key of keys) {if(saved[key]===undefined)delete process.env[key];else process.env[key]=saved[key];}}
 });
 
+test('demo identity remains usable after password and profile credential attempts', async () => {
+  const {demoEmail}=require('../service/demoAccount');
+  await request(app).post('/user/sign_up').send({name:'Demo Member',email:demoEmail,password}).expect(201);
+  const demo=await User.findOne({email:demoEmail}).select('+password +passwordVersion +email');
+  const authorization=token(demo);
+  const rejected=await request(app).patch('/user/updatePassword').set('Authorization',authorization)
+    .send({credentialsLocked:false,email:'other@example.test',password:'ChangedDemo123',confirmPassword:'ChangedDemo123'}).expect(403);
+  assert.equal(rejected.body.message,'展示帳號無法修改帳密');
+  for(const patch of [{email:'renamed@example.test'},{password:'ChangedDemo123'},{newPassword:'ChangedDemo123',name:'Must not save'}]) {
+    await request(app).patch('/user/profile').set('Authorization',authorization).send(patch).expect(403);
+  }
+  const unchanged=await User.findById(demo.id).select('+password +passwordVersion +email');
+  assert.equal(unchanged.password,demo.password);assert.equal(unchanged.passwordVersion,demo.passwordVersion);
+  assert.equal(unchanged.email,demoEmail);assert.equal(unchanged.name,demo.name);
+  await request(app).post('/user/sign_in').send({email:demoEmail.toUpperCase(),password}).expect(200);
+  await request(app).post('/user/sign_in').send({email:demoEmail,password:'ChangedDemo123'}).expect(400);
+  await request(app).get('/user/checkLogin').set('Authorization',authorization).expect(200);
+  const profile=await request(app).patch('/user/profile').set('Authorization',authorization).send({name:'Demo Updated',credentialsLocked:false}).expect(200);
+  assert.equal(profile.body.user.credentialsLocked,true);assert.equal(profile.body.user.email,undefined);
+  const current=await request(app).get('/user/profile').set('Authorization',authorization).expect(200);
+  assert.equal(current.body.user.credentialsLocked,true);assert.equal(current.body.user.email,undefined);
+  await request(app).delete('/users').set('Authorization',authorization).expect(403);
+});
+
 test('only an existing admin role can reach bulk deletion (isolated database only)',async()=>{
  const admin=await User.create({name:'QA Admin',email:'admin@example.test',password:'unused-test-hash',role:'admin'});
  await request(app).delete('/posts').set('Authorization',token(admin)).expect(200);

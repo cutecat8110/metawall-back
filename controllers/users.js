@@ -9,6 +9,7 @@ const validator = require("validator");
 const appError = require("../service/appError");
 
 const { generateJwt } = require("../service/auth");
+const { credentialFields } = require("../service/demoAccount");
 
 const users = {
   checkLogin: handleErrorAsync(async (req, res, next) => {
@@ -79,6 +80,7 @@ const users = {
     generateJwt(user, 200, res);
   }),
   updatePassword: handleErrorAsync(async (req, res, next) => {
+    if (req.credentialsLocked) return appError(403, "展示帳號無法修改帳密", next);
     const { password, confirmPassword } = req.body;
 
     // 欄位必填
@@ -107,7 +109,7 @@ const users = {
     const { p } = req.query;
 
     if (!p) {
-      const msg = { user: req.user };
+      const msg = { user: { ...req.user.toObject(), credentialsLocked: req.credentialsLocked } };
       return handleSuccess(200, msg, res);
     }
 
@@ -121,6 +123,8 @@ const users = {
     handleSuccess(200, msg, res);
   }),
   updateProfile: handleErrorAsync(async (req, res, next) => {
+    if (req.credentialsLocked && credentialFields.some(field => Object.hasOwn(req.body, field)))
+      return appError(403, "展示帳號無法修改帳密", next);
     let { name, photo, sex } = req.body;
 
     // name 不能為空字串
@@ -146,7 +150,7 @@ const users = {
 
     const msg = {
       message: "用戶資訊已更新",
-      user,
+      user: { ...user.toObject(), credentialsLocked: req.credentialsLocked },
     };
     handleSuccess(200, msg, res);
   }),
