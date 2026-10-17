@@ -186,8 +186,9 @@ test('updated Imgur SDK refreshes authentication and serializes the real upload 
  } finally {for(const key of keys) {if(saved[key]===undefined)delete process.env[key];else process.env[key]=saved[key];}}
 });
 
-test('demo identity remains usable after password and profile credential attempts', async () => {
-  const {demoEmail}=require('../service/demoAccount');
+test('current and previous demo identities remain usable after credential attempts', async () => {
+  const {protectedDemoEmails}=require('../service/demoAccount');
+  for (const demoEmail of protectedDemoEmails) {
   await request(app).post('/user/sign_up').send({name:'Demo Member',email:demoEmail,password}).expect(201);
   const demo=await User.findOne({email:demoEmail}).select('+password +passwordVersion +email');
   const authorization=token(demo);
@@ -208,6 +209,7 @@ test('demo identity remains usable after password and profile credential attempt
   const current=await request(app).get('/user/profile').set('Authorization',authorization).expect(200);
   assert.equal(current.body.user.credentialsLocked,true);assert.equal(current.body.user.email,undefined);
   await request(app).delete('/users').set('Authorization',authorization).expect(403);
+  }
 });
 
 test('only an existing admin role can reach bulk deletion (isolated database only)',async()=>{
